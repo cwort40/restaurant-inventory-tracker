@@ -2,7 +2,6 @@ asgiref==3.6.0
 chartjs==1.2
 dj-database-url==1.2.0
 Django==3.2.5
-django-chartjs==2.3.0
 django-heroku==0.3.1
 psycopg2==2.9.5
 pytz==2022.7.1

@@ -163,61 +163,6 @@ class MenuItemDeleteView(LoginRequiredMixin, DeleteView):
     success_url = '/menu'
 
 
-# Define IngredientChartView to display a bar chart of ingredients
-class IngredientChartView(LoginRequiredMixin, BaseLineChartView):
-    # Displays a line chart of ingredients
-    def get_labels(self):
-        # Return the names of the ingredients as labels
-        return [ingredient.name for ingredient in Ingredient.objects.all()]
-
-    def get_providers(self):
-        # Return names of datasets
-        return ["Restaurant Inventory"]
-
-    def get_data(self):
-        # Return the quantities of the ingredients as data
-        return [[ingredient.quantity for ingredient in Ingredient.objects.all()]]
-
-
-# Define view to render reports template
-ingredient_chart = TemplateView.as_view(template_name='inventoryApp/insights.html')
-
-# Define view to render JSON data for line chart
-ingredient_chart_json = IngredientChartView.as_view()
-
-
-# Define PurchaseLineChartView to display a line chart of purchases
-class PurchaseLineChartView(BaseLineChartView):
-    def get_labels(self):
-        # Return the days of the week labels.
-        return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-
-    def get_providers(self):
-        # Return names of menu items.
-        return [item.title for item in MenuItem.objects.all()]
-
-    def get_data(self):
-        # Return the quantities purchased of each menu item as data.
-        data = []
-        today = datetime.now().date()
-        one_week_ago = today - timedelta(days=7)
-
-        for item in MenuItem.objects.all():
-            item_purchases = Purchase.objects.filter(menu_item=item, timestamp__gte=one_week_ago)
-            day_counts = [0, 0, 0, 0, 0, 0, 0]
-            for purchase in item_purchases:
-                day_counts[(purchase.timestamp.weekday() + 1) % 7] += 1
-            data.append(day_counts)
-        return data
-
-
-# Define view to render reports template
-purchase_chart = TemplateView.as_view(template_name='inventoryApp/insights.html')
-
-# Define view to render JSON data for line chart
-purchase_chart_json = PurchaseLineChartView.as_view()
-
-
 # Define RestaurantSummaryView to display restaurant metrics
 class RestaurantSummaryView(View):
     # Displays a restaurant summary
