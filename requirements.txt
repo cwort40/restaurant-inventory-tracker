@@ -1,8 +1,10 @@
 asgiref==3.6.0
 chartjs==1.2
+dj-database-url==1.2.0
+Django==3.2.5
 django-chartjs==2.3.0
-Django==4.1.6
-pip==22.3.1
-setuptools==65.5.1
+django-heroku==0.3.1
+psycopg2==2.9.5
+pytz==2022.7.1
 sqlparse==0.4.3
-wheel==0.38.4
+whitenoise==6.3.0
