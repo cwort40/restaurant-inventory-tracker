@@ -1,6 +1,3 @@
-from datetime import datetime, timedelta
-
-from chartjs.views.lines import BaseLineChartView
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
