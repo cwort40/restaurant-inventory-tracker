@@ -1,0 +1,18 @@
+{% extends 'inventoryApp/base.html' %}
+{% block title %}Add Recipe{% endblock %}
+{% block content %}
+
+    <h3>Add a new ingredient</h3>
+    <form id="form-container" method="POST">
+        {% csrf_token %}
+        {{recipe_requirements_formset.management_form}}
+        {% for form in recipe_requirements_formset %}
+        <div class="recipe-requirements-form">
+        {{form.as_p}}
+        </div>
+        {% endfor %}
+        <button id="add-ingredient-form" type="button" onclick="addIngredientForm()">Add Another Ingredient</button>
+        <button type="submit">Create Recipe</button>
+    </form>
+
+{% endblock %}

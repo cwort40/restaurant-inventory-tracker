@@ -1,0 +1,73 @@
+{% extends 'inventoryApp/base.html' %}
+{% block title %}Ingredients{% endblock %}
+{% block content %}
+
+<div class="container bg-dark-subtle mt-5 pt-3 pb-3">
+    <h2 style="text-align: center">Ingredients</h2>
+    <div class="row justify-content-between mb-3">
+        <div class="col-md-2">
+            <a type="button" class="btn btn-primary btn-block" href="{% url 'add-ingredient' %}">Add New Ingredient</a>
+        </div>
+        <div class="col-md-3">
+            <form action="" method="get">
+              <input class="form-control" style="width: auto" type="text" name="search" placeholder="Search Ingredients">
+            </form>
+        </div>
+   </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <head>
+                <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Unit Price</th>
+                    <th>Delete</th>
+                </tr>
+            </head>
+            <tbody>
+            {% for ingredient in object_list %}
+                <tr>
+                    <td>
+                        <a href="{% url "update-ingredient" ingredient.id %}">{{ ingredient.name }}</a>
+                    </td>
+                    <td>{{ ingredient.quantity }}</td>
+                    <td>{{ ingredient.unit }}</td>
+                    <td class="price">${{ ingredient.price_per_unit|stringformat:".2f" }}</td>
+                    <td><a href="{% url 'delete-ingredient' ingredient.id %}">Delete</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link bg-body-secondary" href="?page=1">First</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link bg-body-secondary" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+          </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+          <span class="page-link bg-body-secondary">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+          </span>
+        </li>
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link bg-body-secondary" href="?page={{ page_obj.next_page_number }}">Next</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link bg-body-secondary" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'inventoryApp/base.html' %}
+{% block title %}Delete Menu Item{% endblock %}
+{% block content %}
+
+    <div class="d-flex justify-content-center mt-5 mb-3">
+      <div class="col-md-2">
+        <h2 class="text-center">Delete Menu Item</h2>
+        <form method="post">{% csrf_token %}
+          <p class="text-center my-3">Are you sure you want to delete {{ object.title }}?</p>
+          <div class="d-flex justify-content-around ">
+            <a class="btn btn-primary" href="javascript:history.go(-1);">Back</a>
+            <input class="btn btn-primary" type="submit" value="Confirm">
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+{% endblock %}

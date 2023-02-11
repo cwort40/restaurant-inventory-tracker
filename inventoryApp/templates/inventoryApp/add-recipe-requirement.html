@@ -1,0 +1,16 @@
+{% extends 'inventoryApp/base.html' %}
+{% block title %}Add Recipe Requirement{% endblock %}
+{% block content %}
+
+      <div class="row justify-content-center mt-3 mb-3">
+        <label class="text-center"><h1>Add Recipe Requirement</h1></label>
+      </div>
+      <form method="post" class="form-group" style="text-align: center;">
+          {% csrf_token %}
+          {{ form }}
+          <button type="button" class="btn btn-primary mt-3 mb-3" style="text-align: center;"
+                  onClick="javascript:history.go(-1);">Back</button>
+          <input type="submit"  class="btn btn-primary mt-3 mb-3" value="Add" style="text-align: center;"/>
+      </form>
+
+{% endblock %}
