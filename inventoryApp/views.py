@@ -161,7 +161,7 @@ class MenuItemDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # Define RestaurantSummaryView to display restaurant metrics
-class RestaurantSummaryView(View):
+class RestaurantSummaryView(LoginRequiredMixin, View):
     # Displays a restaurant summary
     def get(self, request, *args, **kwargs):
         ingredients = Ingredient.objects.all()
