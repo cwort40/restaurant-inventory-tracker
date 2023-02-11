@@ -20,8 +20,7 @@ from django.urls import path
 from inventoryApp import views
 from inventoryApp.views import IngredientListView, MenuListView, PurchaseListView, IngredientUpdateView, \
     IngredientCreateView, IngredientDeleteView, PurchaseAddView, PurchaseDeleteView, MenuItemCreateView, \
-    MenuItemUpdateView, NewRecipeRequirementView, MenuItemDeleteView, ingredient_chart, ingredient_chart_json, \
-    purchase_chart, purchase_chart_json, RestaurantSummaryView
+    MenuItemUpdateView, NewRecipeRequirementView, MenuItemDeleteView, RestaurantSummaryView
 
 urlpatterns = [
     path('accounts/login/', auth_views.LoginView.as_view(), name="login"),
@@ -29,10 +28,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.about, name='about'),
     path('insights/', RestaurantSummaryView.as_view(), name='insights'),
-    path('chart', ingredient_chart, name='ingredient-chart'),
-    path('ingredient_chartJSON', ingredient_chart_json, name='ingredient-chart-json'),
-    path('purchase_chart', purchase_chart, name='purchase-chart'),
-    path('purchase_chartJSON', purchase_chart_json, name='purchase-chart-json'),
     path('ingredients/', IngredientListView.as_view(), name='ingredient-detail'),
     path('ingredients/<slug:pk>/update', IngredientUpdateView.as_view(), name="update-ingredient"),
     path('ingredients/add', IngredientCreateView.as_view(), name="add-ingredient"),

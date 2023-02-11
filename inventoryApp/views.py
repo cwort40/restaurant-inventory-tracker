@@ -7,11 +7,18 @@ from django.views.generic import ListView, UpdateView, CreateView, DeleteView, T
 from inventoryApp.forms import IngredientForm, MenuItemForm, RecipeRequirementForm
 from inventoryApp.models import Ingredient, MenuItem, Purchase, RecipeRequirement
 
+from django.contrib.auth import views as auth_views
+
 
 # Define 2 functions to render HTML pages
 def base(request):
     # Render the base.html page
     return render(request, 'inventoryApp/base.html')
+
+
+class LoginView(auth_views.LoginView):
+    template_name = 'registration/login.html'
+    success_url = '/'
 
 
 def about(request):
