@@ -21,9 +21,11 @@ class LoginView(auth_views.LoginView):
     success_url = '/'
 
 
-def about(request):
-    # Render the about.html page
-    return render(request, 'inventoryApp/about.html')
+# def about(request):
+#     # Render the about.html page
+#     return render(request, 'inventoryApp/about.html')
+class AboutView(LoginRequiredMixin, TemplateView):
+    template_name = 'inventoryApp/about.html'
 
 
 # Define ListView to display a list of ingredients

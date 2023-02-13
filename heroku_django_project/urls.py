@@ -20,13 +20,13 @@ from django.urls import path
 from inventoryApp import views
 from inventoryApp.views import IngredientListView, MenuListView, PurchaseListView, IngredientUpdateView, \
     IngredientCreateView, IngredientDeleteView, PurchaseAddView, PurchaseDeleteView, MenuItemCreateView, \
-    MenuItemUpdateView, NewRecipeRequirementView, MenuItemDeleteView, RestaurantSummaryView
+    MenuItemUpdateView, NewRecipeRequirementView, MenuItemDeleteView, RestaurantSummaryView, AboutView
 
 urlpatterns = [
     path('accounts/login/', auth_views.LoginView.as_view(), name="login"),
     path("logout/", views.log_out, name="logout"),
     path('admin/', admin.site.urls),
-    path('', views.about, name='about'),
+    path('', AboutView.as_view(), name='about'),
     path('insights/', RestaurantSummaryView.as_view(), name='insights'),
     path('ingredients/', IngredientListView.as_view(), name='ingredient-detail'),
     path('ingredients/<slug:pk>/update', IngredientUpdateView.as_view(), name="update-ingredient"),
