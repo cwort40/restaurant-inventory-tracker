@@ -122,4 +122,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+
 django_heroku.settings(locals())
