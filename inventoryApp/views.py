@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+
+from chartjs.views.lines import BaseLineChartView
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
@@ -16,14 +19,19 @@ def base(request):
     return render(request, 'inventoryApp/base.html')
 
 
+# Login view that redirects user to about page
 class LoginView(auth_views.LoginView):
     template_name = 'registration/login.html'
     success_url = '/'
 
 
-# def about(request):
-#     # Render the about.html page
-#     return render(request, 'inventoryApp/about.html')
+# handles logout request and redirects user to login page
+def log_out(request):
+    logout(request)
+    return redirect("/accounts/login")
+
+
+# About page
 class AboutView(LoginRequiredMixin, TemplateView):
     template_name = 'inventoryApp/about.html'
 
@@ -179,7 +187,8 @@ class RestaurantSummaryView(LoginRequiredMixin, View):
         # Calculate the total cost of inventory, total revenue, and total profit
         total_cost_of_inventory, total_revenue, total_profit = 0, 0, 0
         if ingredients and purchases:
-            total_cost_of_inventory = sum([ingredient.quantity * ingredient.price_per_unit for ingredient in ingredients])
+            total_cost_of_inventory = sum(
+                [ingredient.quantity * ingredient.price_per_unit for ingredient in ingredients])
             total_revenue = sum([purchase.menu_item.price for purchase in purchases])
             total_profit = total_revenue - total_cost_of_inventory
 
@@ -192,7 +201,56 @@ class RestaurantSummaryView(LoginRequiredMixin, View):
         return render(request, "inventoryApp/insights.html", context)
 
 
-# handles logout request and redirects user to login page
-def log_out(request):
-    logout(request)
-    return redirect("/accounts/login")
+# Define IngredientChartView to display a bar chart of ingredients
+class IngredientChartView(LoginRequiredMixin, BaseLineChartView):
+    # Displays a line chart of ingredients
+    def get_labels(self):
+        # Return the names of the ingredients as labels
+        return [ingredient.name for ingredient in Ingredient.objects.all()]
+
+    def get_providers(self):
+        # Return names of datasets
+        return ["Restaurant Inventory"]
+
+    def get_data(self):
+        # Return the quantities of the ingredients as data
+        return [[ingredient.quantity for ingredient in Ingredient.objects.all()]]
+
+
+# Define view to render reports template
+ingredient_chart = TemplateView.as_view(template_name='inventoryApp/insights.html')
+
+# Define view to render JSON data for line chart
+ingredient_chart_json = IngredientChartView.as_view()
+
+
+# Define PurchaseLineChartView to display a line chart of purchases
+class PurchaseLineChartView(BaseLineChartView):
+    def get_labels(self):
+        # Return the days of the week labels.
+        return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+    def get_providers(self):
+        # Return names of menu items.
+        return [item.title for item in MenuItem.objects.all()]
+
+    def get_data(self):
+        # Return the quantities purchased of each menu item as data.
+        data = []
+        today = datetime.now().date()
+        one_week_ago = today - timedelta(days=7)
+
+        for item in MenuItem.objects.all():
+            item_purchases = Purchase.objects.filter(menu_item=item, timestamp__gte=one_week_ago)
+            day_counts = [0, 0, 0, 0, 0, 0, 0]
+            for purchase in item_purchases:
+                day_counts[(purchase.timestamp.weekday() + 1) % 7] += 1
+            data.append(day_counts)
+        return data
+
+
+# Define view to render reports template
+purchase_chart = TemplateView.as_view(template_name='inventoryApp/insights.html')
+
+# Define view to render JSON data for line chart
+purchase_chart_json = PurchaseLineChartView.as_view()

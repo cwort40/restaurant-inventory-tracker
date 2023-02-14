@@ -37,6 +37,55 @@
       </div>
     </div>
   </div>
+  <div class="row p-5">
+    <div class="col-md-6 col-sm-12">
+      <div class="card mb-3" style="min-width: 18rem; text-align: center;">
+        <div class="card-body">
+          <h5 class="card-title">Ingredients and Quantities</h5>
+
+          <canvas id="ingredient-chart" width="500" height="400"></canvas>
+
+            <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+            <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+            <script type="text/javascript">
+                $.get('{% url "ingredient-chart-json" %}', function(data) {
+                    const ctx = $("#ingredient-chart").get(0).getContext("2d");
+                    new Chart(ctx, {
+                        type: 'doughnut', data: data
+                    });
+                });
+            </script>
+
+        </div>
+        <div class="card-footer text-muted">
+          <p>This chart displays all the ingredients and their quantities. This can be used to easily determine
+              which ingredients need to be restocked.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-sm-12">
+      <div class="card mb-3" style="min-width: 18rem; text-align: center;">
+        <div class="card-body">
+          <h5 class="card-title">Menu Item Purchases</h5>
+
+          <canvas id="purchase-chart" width="500" height="400"></canvas>
+
+            <script type="text/javascript">
+                $.get('{% url "purchase-chart-json" %}', function(data) {
+                    const ctx = $("#purchase-chart").get(0).getContext("2d");
+                    new Chart(ctx, {
+                        type: 'bar', data: data
+                    });
+                });
+            </script>
+
+        </div>
+        <div class="card-footer text-muted">
+          <p>This chart displays how many purchases of a particular menu item there were in the past week split
+              up by days. The chart includes each menu item that has been purchased in the last seven days.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
-
