@@ -1,18 +1,19 @@
 from datetime import datetime, timedelta
+from itertools import cycle
 
+from chartjs.colors import next_color
 from chartjs.views.lines import BaseLineChartView
 from django.contrib.auth import logout
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import ListView, UpdateView, CreateView, DeleteView, TemplateView
+from django.views.generic import ListView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 
 from inventoryApp.constants.util import UnitConversionUtil
 from inventoryApp.forms import IngredientForm, MenuItemForm, RecipeRequirementForm
 from inventoryApp.models import Ingredient, MenuItem, Purchase, RecipeRequirement
-
-from django.contrib.auth import views as auth_views
 
 
 # Define 2 functions to render HTML pages
@@ -237,11 +238,15 @@ class IngredientChartView(LoginRequiredMixin, BaseLineChartView):
 
     def get_providers(self):
         # Return names of datasets
-        return ["Restaurant Inventory"]
+        return ["restaurant inventory"]
+
+    def get_colors(self):
+        # Return colors to be used by chart
+        return next_color()
 
     def get_data(self):
         # Return the quantities of the ingredients as data
-        return [[ingredient.quantity for ingredient in Ingredient.objects.all()]]
+        return [["{:.1f}".format(ingredient.quantity) for ingredient in Ingredient.objects.all()]]
 
 
 # Define view to render reports template
