@@ -3,10 +3,12 @@ from datetime import datetime, timedelta
 from chartjs.views.lines import BaseLineChartView
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import ListView, UpdateView, CreateView, DeleteView, TemplateView
 
+from inventoryApp.constants.util import UnitConversionUtil
 from inventoryApp.forms import IngredientForm, MenuItemForm, RecipeRequirementForm
 from inventoryApp.models import Ingredient, MenuItem, Purchase, RecipeRequirement
 
@@ -109,15 +111,40 @@ class PurchaseAddView(LoginRequiredMixin, TemplateView):
     def post(self, request):
         menu_item_id = request.POST["menu_item"]
         menu_item = MenuItem.objects.get(pk=menu_item_id)
-        requirements = menu_item.reciperequirement_set
+        requirements = menu_item.reciperequirement_set.all()
         purchase = Purchase(menu_item=menu_item)
 
-        for requirement in requirements.all():
+        for requirement in requirements:
             required_ingredient = requirement.ingredient
-            required_ingredient.quantity -= requirement.quantity
-            required_ingredient.save()
+            required_quantity = requirement.quantity
+            required_unit = requirement.unit
+            available_quantity = required_ingredient.quantity
+            available_unit = required_ingredient.unit
+            if required_unit != available_unit:
+                # convert the required quantity to a common unit
+                required_quantity = UnitConversionUtil.convert_to_common_unit(required_quantity, required_unit,
+                                                                              required_ingredient.name)
+                available_quantity = UnitConversionUtil.convert_to_common_unit(available_quantity, available_unit,
+                                                                               required_ingredient.name)
 
+            if required_quantity <= available_quantity:
+                # subtract the required quantity from the available quantity
+                available_quantity -= required_quantity
+                # convert the available quantity back to the original unit
+                if required_unit != available_unit:
+                    available_quantity = UnitConversionUtil.convert_to_original_unit(available_quantity, available_unit,
+                                                                                     required_ingredient.name)
+
+                required_ingredient.quantity = available_quantity
+                required_ingredient.save()
+            else:
+                # handle insufficient inventory error
+                return HttpResponse(f"Not enough {required_ingredient.name} in inventory")
+
+        # save the purchase object
         purchase.save()
+
+        # redirect to a success page
         return redirect("/purchases")
 
 
@@ -201,7 +228,7 @@ class RestaurantSummaryView(LoginRequiredMixin, View):
         return render(request, "inventoryApp/insights.html", context)
 
 
-# Define IngredientChartView to display a bar chart of ingredients
+# Define IngredientChartView to display a doughnut chart of ingredients
 class IngredientChartView(LoginRequiredMixin, BaseLineChartView):
     # Displays a line chart of ingredients
     def get_labels(self):

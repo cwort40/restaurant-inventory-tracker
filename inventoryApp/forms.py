@@ -1,16 +1,20 @@
 from django import forms
 
+from inventoryApp.constants.measurements import UNITS_OF_MEASUREMENT
 from inventoryApp.models import Ingredient, RecipeRequirement, Purchase, MenuItem
 
 
 # Creating a ModelForm class for the Ingredient model
 class IngredientForm(forms.ModelForm):
-    # Defining a Meta class to specify which model and fields to use
+    UNIT_CHOICES = UNITS_OF_MEASUREMENT
+    unit = forms.ChoiceField(choices=UNIT_CHOICES, widget=forms.Select(attrs={
+        'class': 'form-control',
+        'style': 'margin: 0 auto; width: auto; text-align: center;'
+    }))
+
     class Meta:
         model = Ingredient
-        # Set fields to all fields from the Ingredient model
         fields = "__all__"
-        # Set widgets for each of the fields
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -20,11 +24,6 @@ class IngredientForm(forms.ModelForm):
             'quantity': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Quantity',
-                'style': 'margin: 0 auto; width: auto; text-align: center;'
-            }),
-            'unit': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Unit',
                 'style': 'margin: 0 auto; width: auto; text-align: center;'
             }),
             'price_per_unit': forms.NumberInput(attrs={
@@ -75,9 +74,20 @@ class MenuItemForm(forms.ModelForm):
 
 
 class RecipeRequirementForm(forms.ModelForm):
+    UNIT_CHOICES = UNITS_OF_MEASUREMENT
+    quantity = forms.FloatField(widget=forms.NumberInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Quantity',
+        'style': 'margin: 0 auto; width: auto; text-align: center;'
+    }))
+    unit = forms.ChoiceField(choices=UNIT_CHOICES, widget=forms.Select(attrs={
+        'class': 'form-control',
+        'style': 'margin: 0 auto; width: auto; text-align: center;'
+    }))
+
     class Meta:
         model = RecipeRequirement
-        fields = "__all__"
+        fields = ['menu_item', 'ingredient', 'quantity', 'unit']
         widgets = {
             'menu_item': forms.Select(attrs={
                 'class': 'form-control',
@@ -89,9 +99,5 @@ class RecipeRequirementForm(forms.ModelForm):
                 'placeholder': 'Ingredient',
                 'style': 'margin: 0 auto; width: auto; text-align: center;'
             }),
-            'quantity': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Quantity',
-                'style': 'margin: 0 auto; width: auto; text-align: center;'
-            }),
         }
+

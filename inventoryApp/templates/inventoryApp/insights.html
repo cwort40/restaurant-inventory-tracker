@@ -74,7 +74,7 @@
                 $.get('{% url "purchase-chart-json" %}', function(data) {
                     const ctx = $("#purchase-chart").get(0).getContext("2d");
                     new Chart(ctx, {
-                        type: 'bar', data: data
+                        type: 'bar', data: data,
                     });
                 });
             </script>

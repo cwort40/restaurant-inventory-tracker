@@ -31,7 +31,7 @@
                     <td>
                         <a href="{% url "update-ingredient" ingredient.id %}">{{ ingredient.name }}</a>
                     </td>
-                    <td>{{ ingredient.quantity }}</td>
+                    <td>{{ ingredient.quantity|stringformat:".1f" }}</td>
                     <td>{{ ingredient.unit }}</td>
                     <td class="price">${{ ingredient.price_per_unit|stringformat:".2f" }}</td>
                     <td><a href="{% url 'delete-ingredient' ingredient.id %}">Delete</a></td>
