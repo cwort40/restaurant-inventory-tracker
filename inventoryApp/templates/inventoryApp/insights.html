@@ -51,7 +51,7 @@
                 $.get('{% url "ingredient-chart-json" %}', function(data) {
                     const ctx = $("#ingredient-chart").get(0).getContext("2d");
                     new Chart(ctx, {
-                        type: 'doughnut', data: data
+                        type: 'pie', data: data
                     });
                 });
             </script>

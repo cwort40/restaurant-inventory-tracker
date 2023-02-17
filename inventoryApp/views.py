@@ -5,14 +5,15 @@ from chartjs.colors import next_color
 from chartjs.views.lines import BaseLineChartView
 from django.contrib.auth import logout
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import ListView, UpdateView, CreateView, DeleteView, TemplateView, FormView
+from django.views.generic import ListView, UpdateView, CreateView, DeleteView, TemplateView
 
 from inventoryApp.constants.util import UnitConversionUtil
-from inventoryApp.forms import IngredientForm, MenuItemForm, RecipeRequirementForm
+from inventoryApp.forms import IngredientForm, MenuItemForm, RecipeRequirementForm, CustomUserCreationForm
 from inventoryApp.models import Ingredient, MenuItem, Purchase, RecipeRequirement
 
 
@@ -28,6 +29,13 @@ class LoginView(auth_views.LoginView):
     success_url = '/'
 
 
+# Register view that redirects user to about page
+class SignupView(CreateView):
+    form_class = CustomUserCreationForm
+    template_name = 'registration/signup.html'
+    success_url = '/'
+
+
 # handles logout request and redirects user to login page
 def log_out(request):
     logout(request)
@@ -35,7 +43,7 @@ def log_out(request):
 
 
 # About page
-class AboutView(LoginRequiredMixin, TemplateView):
+class AboutView(TemplateView):
     template_name = 'inventoryApp/about.html'
 
 

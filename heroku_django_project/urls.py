@@ -21,10 +21,11 @@ from inventoryApp import views
 from inventoryApp.views import IngredientListView, MenuListView, PurchaseListView, IngredientUpdateView, \
     IngredientCreateView, IngredientDeleteView, PurchaseAddView, PurchaseDeleteView, MenuItemCreateView, \
     MenuItemUpdateView, NewRecipeRequirementView, MenuItemDeleteView, RestaurantSummaryView, AboutView, \
-    ingredient_chart, ingredient_chart_json, purchase_chart, purchase_chart_json
+    ingredient_chart, ingredient_chart_json, purchase_chart, purchase_chart_json, SignupView
 
 urlpatterns = [
     path('accounts/login/', auth_views.LoginView.as_view(), name="login"),
+    path('accounts/signup/', SignupView.as_view(), name='signup'),
     path("logout/", views.log_out, name="logout"),
     path('admin/', admin.site.urls),
     path('', AboutView.as_view(), name='about'),

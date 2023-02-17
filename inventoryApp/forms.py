@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 from inventoryApp.constants.measurements import UNITS_OF_MEASUREMENT
 from inventoryApp.models import Ingredient, RecipeRequirement, Purchase, MenuItem
@@ -101,3 +103,20 @@ class RecipeRequirementForm(forms.ModelForm):
             }),
         }
 
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if len(username) < 4:
+            raise forms.ValidationError('Username must be at least 4 characters long')
+        return username
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        if len(password1) < 8:
+            raise forms.ValidationError('Password must be at least 8 characters long')
+        return password1
