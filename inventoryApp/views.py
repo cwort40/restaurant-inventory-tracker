@@ -241,22 +241,17 @@ class RestaurantSummaryView(LoginRequiredMixin, View):
 
 # Define IngredientChartView to display a doughnut chart of ingredients
 class IngredientChartView(LoginRequiredMixin, BaseLineChartView):
-    # Displays a line chart of ingredients
     def get_labels(self):
         # Return the names of the ingredients as labels
-        return [ingredient.name for ingredient in Ingredient.objects.all()]
+        return ['']
 
     def get_providers(self):
         # Return names of datasets
-        return ["restaurant inventory"]
-
-    def get_colors(self):
-        # Return colors to be used by chart
-        return next_color()
+        return [ingredient.name for ingredient in Ingredient.objects.all()]
 
     def get_data(self):
         # Return the quantities of the ingredients as data
-        return [["{:.1f}".format(ingredient.quantity) for ingredient in Ingredient.objects.all()]]
+        return ["{:.1f}".format(ingredient.quantity) for ingredient in Ingredient.objects.all()]
 
 
 # Define view to render reports template
@@ -267,7 +262,7 @@ ingredient_chart_json = IngredientChartView.as_view()
 
 
 # Define PurchaseLineChartView to display a line chart of purchases
-class PurchaseLineChartView(BaseLineChartView):
+class PurchaseLineChartView(LoginRequiredMixin, BaseLineChartView):
     def get_labels(self):
         # Return the days of the week labels.
         return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
