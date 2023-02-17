@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta
-from itertools import cycle
 
 from chartjs.colors import next_color
 from chartjs.views.lines import BaseLineChartView
+from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -61,6 +60,9 @@ class IngredientListView(LoginRequiredMixin, ListView):
         search_term = self.request.GET.get('search', None)
         if search_term:
             queryset = queryset.filter(name__icontains=search_term)
+        # Check if queryset is empty
+        if not queryset.exists():
+            messages.info(self.request, 'No results found.')
         return queryset
 
 

@@ -26,11 +26,15 @@ class IngredientForm(forms.ModelForm):
             'quantity': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Quantity',
+                'min': '0.1',
+                'step': '0.1',
                 'style': 'margin: 0 auto; width: auto; text-align: center;'
             }),
             'price_per_unit': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Price per Unit ($)',
+                'min': '0.1',
+                'step': '0.1',
                 'style': 'margin: 0 auto; width: auto; text-align: center;'
             }),
         }
@@ -70,6 +74,8 @@ class MenuItemForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Price',
+                'min': '0.1',
+                'step': '0.1',
                 'style': 'margin: 0 auto; width: auto; text-align: center;'
             }),
         }
@@ -80,6 +86,8 @@ class RecipeRequirementForm(forms.ModelForm):
     quantity = forms.FloatField(widget=forms.NumberInput(attrs={
         'class': 'form-control',
         'placeholder': 'Quantity',
+        'min': '0.1',
+        'step': '0.1',
         'style': 'margin: 0 auto; width: auto; text-align: center;'
     }))
     unit = forms.ChoiceField(choices=UNIT_CHOICES, widget=forms.Select(attrs={

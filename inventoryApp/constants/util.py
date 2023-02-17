@@ -13,7 +13,7 @@ class UnitConversionUtil:
             if best_match:
                 density = INGREDIENT_DENSITIES[best_match[0]]
             else:
-                raise ValueError(f"No matching density found for ingredient {ingredient_name}")
+                density = 1  # Density of water as default
         for key in UNIT_CONVERSIONS:
             if key.find(unit) != -1:
                 quantity *= UNIT_CONVERSIONS.get(key)
@@ -29,7 +29,7 @@ class UnitConversionUtil:
             if best_match:
                 density = INGREDIENT_DENSITIES[best_match[0]]
             else:
-                raise ValueError(f"No matching density found for ingredient {ingredient_name}")
+                density = 1  # Density of water as default
         for key in UNIT_CONVERSIONS:
             if key.find(unit) != -1:
                 quantity /= UNIT_CONVERSIONS.get(key)

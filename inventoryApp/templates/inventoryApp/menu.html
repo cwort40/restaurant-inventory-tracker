@@ -41,9 +41,15 @@
                 {% for recipe_requirement in menu_item.reciperequirement_set.all %}
                 <li>{{ recipe_requirement.quantity }} {{recipe_requirement.unit }}
                     {{ recipe_requirement.ingredient.name }}</li>
+                {% empty %}
+                    No ingredients.
                 {% endfor %}
             </ul></td>
                 <td><a href="{% url 'delete-menu-item' menu_item.id %}">Delete</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No results found.</td>
                 </tr>
             {% endfor %}
             </tbody>

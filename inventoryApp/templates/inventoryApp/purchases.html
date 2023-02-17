@@ -32,6 +32,10 @@
                     <td>{{ purchase.timestamp }}</td>
                     <td><a href="{% url 'delete-purchase' purchase.id %}">Delete</a></td>
                 </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No results found.</td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>
@@ -64,5 +68,6 @@
       </ul>
     </div>
 </div>
+
 
 {% endblock %}
