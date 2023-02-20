@@ -114,8 +114,8 @@ class RecipeRequirementForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
-        self.fields['menu_item'].queryset = MenuItem.objects.filter(user=user)
-        self.fields['ingredient'].queryset = Ingredient.objects.filter(user=user)
+        self.fields['menu_item'].queryset = MenuItem.objects.filter(user=user).order_by('title')
+        self.fields['ingredient'].queryset = Ingredient.objects.filter(user=user).order_by('name')
 
 
 class CustomUserCreationForm(UserCreationForm):
