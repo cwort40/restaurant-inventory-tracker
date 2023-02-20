@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from chartjs.colors import next_color
 from chartjs.views.lines import BaseLineChartView
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -57,6 +56,7 @@ class IngredientListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # Filter the queryset based on a search term
         queryset = super().get_queryset()
+        queryset = queryset.filter(user=self.request.user)
         search_term = self.request.GET.get('search', None)
         if search_term:
             queryset = queryset.filter(name__icontains=search_term)
@@ -74,6 +74,11 @@ class IngredientUpdateView(LoginRequiredMixin, UpdateView):
     form_class = IngredientForm
     success_url = '/ingredients'
 
+    # Form validation for current user
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
 
 class IngredientCreateView(LoginRequiredMixin, CreateView):
     # Create an ingredient
@@ -81,6 +86,11 @@ class IngredientCreateView(LoginRequiredMixin, CreateView):
     model = Ingredient
     form_class = IngredientForm
     success_url = '/ingredients'
+
+    # Form validation for current user
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 
 class IngredientDeleteView(LoginRequiredMixin, DeleteView):
@@ -101,6 +111,7 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # Filter the queryset based on a search term
         queryset = super().get_queryset()
+        queryset = queryset.filter(user=self.request.user)
         search_term = self.request.GET.get('search', None)
         if search_term:
             queryset = queryset.filter(menu_item__title__icontains=search_term)
@@ -115,15 +126,15 @@ class PurchaseAddView(LoginRequiredMixin, TemplateView):
     # Checks if menu item is available
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["menu_items"] = [X for X in MenuItem.objects.all() if X.available()]
+        context["menu_items"] = [X for X in MenuItem.objects.all().filter(user=self.request.user) if X.available()]
         return context
 
     # Removes the ingredients from the inventory that were used to make the menu item
     def post(self, request):
         menu_item_id = request.POST["menu_item"]
         menu_item = MenuItem.objects.get(pk=menu_item_id)
-        requirements = menu_item.reciperequirement_set.all()
-        purchase = Purchase(menu_item=menu_item)
+        requirements = menu_item.reciperequirement_set.all().filter(user=self.request.user)
+        purchase = Purchase(menu_item=menu_item, user=self.request.user)
 
         for requirement in requirements:
             required_ingredient = requirement.ingredient
@@ -178,6 +189,7 @@ class MenuListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # Filter the queryset based on a search term
         queryset = super().get_queryset()
+        queryset = queryset.filter(user=self.request.user)
         search_term = self.request.GET.get('search', None)
         if search_term:
             queryset = queryset.filter(title__icontains=search_term)
@@ -192,6 +204,11 @@ class MenuItemUpdateView(LoginRequiredMixin, UpdateView):
     form_class = MenuItemForm
     success_url = '/menu'
 
+    # Form validation for current user
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
 
 class MenuItemCreateView(LoginRequiredMixin, CreateView):
     # Create a menu item
@@ -200,12 +217,28 @@ class MenuItemCreateView(LoginRequiredMixin, CreateView):
     form_class = MenuItemForm
     success_url = '/menu'
 
+    # Form validation for current user
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
+
+# Add a new recipe requirement
 class NewRecipeRequirementView(LoginRequiredMixin, CreateView):
     # Create a recipe requirement
     template_name = "inventoryApp/add-recipe-requirement.html"
     model = RecipeRequirement
     form_class = RecipeRequirementForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    # Form validation for current user
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 
 class MenuItemDeleteView(LoginRequiredMixin, DeleteView):
@@ -219,8 +252,8 @@ class MenuItemDeleteView(LoginRequiredMixin, DeleteView):
 class RestaurantSummaryView(LoginRequiredMixin, View):
     # Displays a restaurant summary
     def get(self, request, *args, **kwargs):
-        ingredients = Ingredient.objects.all()
-        purchases = Purchase.objects.all()
+        ingredients = Ingredient.objects.all().filter(user=request.user)
+        purchases = Purchase.objects.all().filter(menu_item__user=request.user)
 
         # Calculate the total cost of inventory, total revenue, and total profit
         total_cost_of_inventory, total_revenue, total_profit = 0, 0, 0
@@ -246,12 +279,13 @@ class IngredientChartView(LoginRequiredMixin, BaseLineChartView):
         return ['']
 
     def get_providers(self):
-        # Return names of datasets
-        return [ingredient.name for ingredient in Ingredient.objects.all()]
+        # Return names of datasets with unit
+        return ["{} ({})".format(ingredient.name, ingredient.unit) for ingredient in
+                Ingredient.objects.all().filter(user=self.request.user)]
 
     def get_data(self):
         # Return the quantities of the ingredients as data
-        return ["{:.1f}".format(ingredient.quantity) for ingredient in Ingredient.objects.all()]
+        return ["{:.1f}".format(ingredient.quantity) for ingredient in Ingredient.objects.all().filter(user=self.request.user)]
 
 
 # Define view to render reports template
@@ -262,14 +296,14 @@ ingredient_chart_json = IngredientChartView.as_view()
 
 
 # Define PurchaseLineChartView to display a line chart of purchases
-class PurchaseLineChartView(LoginRequiredMixin, BaseLineChartView):
+class PurchaseChartView(LoginRequiredMixin, BaseLineChartView):
     def get_labels(self):
         # Return the days of the week labels.
         return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
     def get_providers(self):
         # Return names of menu items.
-        return [item.title for item in MenuItem.objects.all()]
+        return [item.title for item in MenuItem.objects.all().filter(user=self.request.user)]
 
     def get_data(self):
         # Return the quantities purchased of each menu item as data.
@@ -278,7 +312,7 @@ class PurchaseLineChartView(LoginRequiredMixin, BaseLineChartView):
         one_week_ago = today - timedelta(days=7)
 
         for item in MenuItem.objects.all():
-            item_purchases = Purchase.objects.filter(menu_item=item, timestamp__gte=one_week_ago)
+            item_purchases = Purchase.objects.filter(menu_item=item, timestamp__gte=one_week_ago, user=self.request.user)
             day_counts = [0, 0, 0, 0, 0, 0, 0]
             for purchase in item_purchases:
                 day_counts[(purchase.timestamp.weekday() + 1) % 7] += 1
@@ -290,4 +324,4 @@ class PurchaseLineChartView(LoginRequiredMixin, BaseLineChartView):
 purchase_chart = TemplateView.as_view(template_name='inventoryApp/insights.html')
 
 # Define view to render JSON data for line chart
-purchase_chart_json = PurchaseLineChartView.as_view()
+purchase_chart_json = PurchaseChartView.as_view()

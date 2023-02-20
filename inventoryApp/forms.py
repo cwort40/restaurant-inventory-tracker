@@ -16,7 +16,7 @@ class IngredientForm(forms.ModelForm):
 
     class Meta:
         model = Ingredient
-        fields = "__all__"
+        fields = ['name', 'quantity', 'unit', 'price_per_unit']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -46,7 +46,7 @@ class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
         # Set fields to all fields from the Purchase model
-        fields = "__all__"
+        fields = ['menu_item']
         # Set widgets for each of the fields
         widgets = {
             'menu_item': forms.TextInput(attrs={
@@ -63,7 +63,7 @@ class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
         # Set fields to all fields from the MenuItem model
-        fields = "__all__"
+        fields = ['title', 'price']
         # Set widgets for each of the fields
         widgets = {
             'title': forms.TextInput(attrs={
@@ -110,6 +110,12 @@ class RecipeRequirementForm(forms.ModelForm):
                 'style': 'margin: 0 auto; width: auto; text-align: center;'
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+        self.fields['menu_item'].queryset = MenuItem.objects.filter(user=user)
+        self.fields['ingredient'].queryset = Ingredient.objects.filter(user=user)
 
 
 class CustomUserCreationForm(UserCreationForm):

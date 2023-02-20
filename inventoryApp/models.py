@@ -2,6 +2,7 @@ from django.db import models
 
 from inventoryApp.constants.measurements import UNITS_OF_MEASUREMENT
 from inventoryApp.constants.util import UnitConversionUtil
+from django.contrib.auth.models import User
 
 
 # Create your models here.
@@ -9,6 +10,7 @@ class MenuItem(models.Model):
     # Item on the restaurant's menu
     title = models.CharField(max_length=200, unique=True)
     price = models.FloatField(default=0.00)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
     def get_absolute_url(self):
         return "/menu"
@@ -26,6 +28,7 @@ class Ingredient(models.Model):
     quantity = models.FloatField(default=0)
     unit = models.CharField(max_length=20, choices=UNITS_OF_MEASUREMENT, default='lb')
     price_per_unit = models.FloatField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
     def get_absolute_url(self):
         return "/ingredients"
@@ -40,6 +43,7 @@ class RecipeRequirement(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     quantity = models.FloatField(default=0)
     unit = models.CharField(max_length=20, choices=UNITS_OF_MEASUREMENT, default='lb')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return f"{self.menu_item.title}: {self.ingredient.name} {self.quantity} {self.get_unit_display()}"
@@ -58,6 +62,7 @@ class Purchase(models.Model):
     # Purchase of a MenuItem
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return f"{self.menu_item.__str__()} @ {self.timestamp}"
