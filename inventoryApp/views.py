@@ -2,11 +2,12 @@ from datetime import datetime, timedelta
 
 from chartjs.views.lines import BaseLineChartView
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, UpdateView, CreateView, DeleteView, TemplateView
 
@@ -31,7 +32,13 @@ class LoginView(auth_views.LoginView):
 class SignupView(CreateView):
     form_class = CustomUserCreationForm
     template_name = 'registration/signup.html'
-    success_url = '/'
+    success_url = reverse_lazy('about')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = form.save()
+        login(self.request, user)
+        return response
 
 
 # handles logout request and redirects user to login page
